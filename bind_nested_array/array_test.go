@@ -39,35 +39,32 @@ func TestNestedArray(t *testing.T) {
 		}
 	}
 
-	transactOpts := &bind.TransactOpts{
+	if _, err := testContract.StoreDeepUintArray(&bind.TransactOpts{
 		From: auth.From,
 		Signer: auth.Signer,
-	}
-
-	if _, err := testContract.StoreDeepUintArray(transactOpts, testArr); err != nil {
+	}, testArr); err != nil {
 		t.Fatalf("Failed to store nested array in test contract: %v", err)
 	}
 
 	sim.Commit()
 
-	callOpts := &bind.CallOpts{
+	retrievedArr, err := testContract.RetrieveDeepArray(&bind.CallOpts{
 		From: auth.From,
 		Pending: false,
-	}
-
-	retrievedArr, err := testContract.RetrieveDeepArray(callOpts)
+	})
 	if err != nil {
 		t.Fatalf("Failed to retrieve nested array from test contract: %v", err)
 	}
 
-	//checking a single value:
-	quickCheck, err := testContract.DeepUint64Array(callOpts, big.NewInt(4), big.NewInt(3), big.NewInt(2))
-	if err != nil {
-		t.Fatalf("Failed to get single array value from nested array. %v", err)
+	//quick check to see if contents were copied
+	// (See accounts/abi/unpack_test.go for more extensive testing)
+	if retrievedArr[4][3][2] != testArr[4][3][2] {
+		t.Fatalf("Retrieved value does not match expected value! got: %d, expected: %d. %v", retrievedArr[4][3][2], testArr[4][3][2], err)
 	}
-	if quickCheck != testArr[4][3][2] {
-		t.Fatalf("Retrieved value does not match expected value! got: %d, expected: %d. %v", quickCheck, testArr[4][3][2], err)
-	}
+
+}
+
+func printContentComparison(testArr [5][4][3]uint64, retrievedArr [5][4][3]uint64) {
 
 	//comparing every single value:
 	for i := 0; i < 5; i++ {
@@ -90,5 +87,4 @@ func TestNestedArray(t *testing.T) {
 			}
 		}
 	}
-
 }
