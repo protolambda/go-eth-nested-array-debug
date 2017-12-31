@@ -1,4 +1,4 @@
-package bind_nested_array_test
+package bindtest
 
 import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -7,7 +7,6 @@ import (
 	"math/big"
 	"github.com/ethereum/go-ethereum/crypto"
 	"testing"
-	"protolambda.com/eth_bind_test/bind_nested_array"
 	"fmt"
 )
 
@@ -18,7 +17,7 @@ func TestNestedArray(t *testing.T) {
 	sim := backends.NewSimulatedBackend(core.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}})
 
 	//deploy the test contract
-	_, _, testContract, err := bind_nested_array.DeployTestContract(auth, sim)
+	_, _, testContract, err := DeployDeeplyNestedArray(auth, sim)
 	if err != nil {
 		t.Fatalf("Failed to deploy test contract: %v", err)
 	}
